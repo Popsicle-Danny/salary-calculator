@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工資計算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .day-entry {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .day-label {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 60px;
+        }
+
+        .time-inputs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        input[type="time"] {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type="time"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .separator {
+            font-weight: bold;
+            color: #999;
+        }
+
+        .quick-btn-group {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            background: #f5f5f5;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .add-day-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            background: transparent;
+            color: #667eea;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .add-day-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .settings-row > div {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #ccc;
+        }
+
+        .btn-example {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-example:hover {
+            background: #43a047;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9ff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .total-row {
+            background: #667eea !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .total-row td {
+            color: white;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            color: #667eea;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .text-input-area {
+            display: none;
+        }
+
+        .text-input-area.active {
+            display: block;
+        }
+
+        .visual-input-area {
+            display: none;
+        }
+
+        .visual-input-area.active {
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+                font-size: 12px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .day-entry {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .time-inputs {
+                width: 100%;
+            }
+
+            input[type="time"] {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 工資計算器</h1>
+
+        <div class="card">
+            <label>選擇輸入方式：</label>
+            <div class="mode-switch">
+                <button class="mode-btn active" onclick="switchMode('visual')">📱 手動輸入（推薦）</button>
+                <button class="mode-btn" onclick="switchMode('text')">⌨️ 文字輸入</button>
+            </div>
+
+            <!-- 視覺化輸入 -->
+            <div class="visual-input-area active" id="visualArea">
+                <div id="daysContainer"></div>
+                <button class="add-day-btn" onclick="addDay()">＋ 新增一天</button>
+            </div>
+
+            <!-- 文字輸入 -->
+            <div class="text-input-area" id="textArea">
+                <div class="input-group">
+                    <label for="input">輸入上班時間（空格分隔）：</label>
+                    <textarea id="input" placeholder="範例：1900-2230 1630-2030 1330-1930 1430 9"></textarea>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="input-group">
+                    <label for="hourlyRate">時薪（元）：</label>
+                    <input type="number" id="hourlyRate" value="196" min="0" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="doubleDays">雙倍薪資天數（逗號分隔）：</label>
+                    <input type="text" id="doubleDays" value="11" placeholder="例如：11 或 11,20">
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-example" onclick="loadExample()">📋 載入範例</button>
+                <button class="btn-secondary" onclick="clearAll()">🗑️ 清空</button>
+                <button class="btn-primary" onclick="calculate()">計算薪資 💰</button>
+            </div>
+        </div>
+
+        <div class="card" id="resultCard" style="display:none;">
+            <h2 style="margin-bottom:12px;">📊 計算結果</h2>
+            <div style="overflow-x:auto;">
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>天數</th>
+                            <th>上班時間</th>
+                            <th>原始時數</th>
+                            <th>扣款</th>
+                            <th>最終工時</th>
+                            <th>當日薪資</th>
+                            <th>備註</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dayCount = 0;
+
+        function switchMode(mode) {
+            const buttons = document.querySelectorAll('.mode-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            if (mode === 'visual') {
+                document.getElementById('visualArea').classList.add('active');
+                document.getElementById('textArea').classList.remove('active');
+                buttons[0].classList.add('active');
+            } else {
+                document.getElementById('visualArea').classList.remove('active');
+                document.getElementById('textArea').classList.add('active');
+                buttons[1].classList.add('active');
+            }
+        }
+
+        function addDay(lateMin = 0, earlyMin = 0, overtimeMin = 0, notes = '', startTime = '09:00', endTime = '18:00') {
+            dayCount++;
+            const container = document.getElementById('daysContainer');
+            
+            const div = document.createElement('div');
+            div.className = 'day-entry';
+            div.id = 'day-' + dayCount;
+            div.innerHTML = `
+                <span class="day-label">第 ${dayCount} 天：</span>
+                <div class="time-inputs">
+                    <input type="time" class="start-time" value="${startTime}">
+                    <span class="separator">～</span>
+                    <input type="time" class="end-time" value="${endTime}">
+                </div>
+                <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; width:100%;">
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <label style="font-size:12px; margin:0;">遲到(分)：</label>
+                        <input type="number" class="late-min" value="${lateMin}" min="0" max="120" style="width:60px; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <label style="font-size:12px; margin:0;">早退(分)：</label>
+                        <input type="number" class="early-min" value="${earlyMin}" min="0" max="120" style="width:60px; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px;">
+                        <label style="font-size:12px; margin:0;">加班(分)：</label>
+                        <input type="number" class="overtime-min" value="${overtimeMin}" min="0" max="480" style="width:60px; padding:4px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+                    </div>
+                    <button class="quick-btn" onclick="setDayHours('${dayCount}', 4)" style="padding:4px 8px; font-size:12px;">4h</button>
+                    <button class="quick-btn" onclick="setDayHours('${dayCount}', 6)" style="padding:4px 8px; font-size:12px;">6h</button>
+                    <button class="quick-btn" onclick="setDayHours('${dayCount}', 8)" style="padding:4px 8px; font-size:12px;">8h</button>
+                    <button class="quick-btn" onclick="setDayHours('${dayCount}', 9)" style="padding:4px 8px; font-size:12px;">9h</button>
+                    <button class="quick-btn" onclick="setDayHours('${dayCount}', 10)" style="padding:4px 8px; font-size:12px;">10h</button>
+                    <button class="quick-btn" onclick="toggleNotes('${dayCount}')" style="padding:4px 8px; font-size:12px;">備註</button>
+                </div>
+                <div id="notes-${dayCount}" style="display:${notes ? 'block' : 'none'}; margin-top:8px; width:100%;">
+                    <input type="text" class="day-notes" value="${notes}" placeholder="輸入備註（如：請假半日、補假等）" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function setDayHours(dayId, hours) {
+            const dayDiv = document.getElementById('day-' + dayId);
+            const startInput = dayDiv.querySelector('.start-time');
+            const endInput = dayDiv.querySelector('.end-time');
+            
+            const startHour = parseInt(startInput.value.split(':')[0]);
+            const endHour = startHour + hours;
+            const endDate = new Date();
+            endDate.setHours(endHour, 0, 0);
+            
+            const endH = String(endDate.getHours()).padStart(2, '0');
+            const endM = String(endDate.getMinutes()).padStart(2, '0');
+            endInput.value = endH + ':' + endM;
+        }
+
+        function toggleNotes(dayId) {
+            const notesDiv = document.getElementById('notes-' + dayId);
+            if (notesDiv.style.display === 'none') {
+                notesDiv.style.display = 'block';
+            } else {
+                notesDiv.style.display = 'none';
+            }
+        }
+
+        function loadExample() {
+            document.getElementById('input').value = '1900-2230 1630-2030 1330-1930 1430 1630-2030 1330-2130 1430-2230 1430-2130 1900-2300 1430-2030 1600-2000 9 9 1630-2030 1330-1930 1730-2130 9 9';
+            
+            document.getElementById('daysContainer').innerHTML = '';
+            dayCount = 0;
+            
+            const times = ['19:00-22:30', '16:30-20:30', '13:30-19:30', 9.5, '16:30-20:30', '13:30-19:30', '14:30-18:00', '14:30-18:30', '19:00-23:00', '14:30-18:00', '16:00-20:00', 9.5, 9.5, '16:30-20:30', '13:30-19:30', '17:30-21:30', 9.5, 9.5];
+            
+            times.forEach((time, index) => {
+                addDay();
+                const dayDiv = document.getElementById('day-' + (index + 1));
+                const startInput = dayDiv.querySelector('.start-time');
+                const endInput = dayDiv.querySelector('.end-time');
+                
+                if (typeof time === 'string' && time.includes('-')) {
+                    const parts = time.split('-');
+                    startInput.value = parts[0].replace(/(\d{2})(\d{2})$/, '$1:$2');
+                    endInput.value = parts[1].replace(/(\d{2})(\d{2})$/, '$1:$2');
+                }
+            });
+            
+            switchMode('visual');
+        }
+
+        function saveData() {
+            const data = {
+                hourlyRate: document.getElementById('hourlyRate').value,
+                doubleDays: document.getElementById('doubleDays').value,
+                days: []
+            };
+            
+            const entries = document.querySelectorAll('.day-entry');
+            entries.forEach(entry => {
+                data.days.push({
+                    startTime: entry.querySelector('.start-time').value,
+                    endTime: entry.querySelector('.end-time').value,
+                    lateMin: entry.querySelector('.late-min').value,
+                    earlyMin: entry.querySelector('.early-min').value,
+                    overtimeMin: entry.querySelector('.overtime-min').value,
+                    notes: entry.querySelector('.day-notes').value
+                });
+            });
+            
+            localStorage.setItem('salaryCalculatorData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('salaryCalculatorData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('hourlyRate').value = data.hourlyRate || '196';
+                document.getElementById('doubleDays').value = data.doubleDays || '';
+                
+                document.getElementById('daysContainer').innerHTML = '';
+                dayCount = 0;
+                
+                if (data.days && data.days.length > 0) {
+                    data.days.forEach(day => {
+                        addDay(
+                            day.lateMin || 0,
+                            day.earlyMin || 0,
+                            day.overtimeMin || 0,
+                            day.notes || '',
+                            day.startTime || '09:00',
+                            day.endTime || '18:00'
+                        );
+                    });
+                } else {
+                    addDay();
+                }
+            } else {
+                addDay();
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('input').value = '';
+            document.getElementById('daysContainer').innerHTML = '';
+            document.getElementById('hourlyRate').value = '196';
+            document.getElementById('doubleDays').value = '';
+            document.getElementById('resultCard').style.display = 'none';
+            dayCount = 0;
+            localStorage.removeItem('salaryCalculatorData');
+            addDay();
+        }
+
+        function parseTime(str) {
+            const hours = Math.floor(str / 100);
+            const minutes = str % 100;
+            return hours + minutes / 60;
+        }
+
+        function formatTime(hhmm) {
+            const hours = Math.floor(hhmm / 100);
+            const minutes = hhmm % 100;
+            return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+        }
+
+        function calculate() {
+            const isVisual = document.getElementById('visualArea').classList.contains('active');
+            let items = [];
+            
+            if (isVisual) {
+                const entries = document.querySelectorAll('.day-entry');
+                if (entries.length === 0) {
+                    alert('請新增至少一天！');
+                    return;
+                }
+                entries.forEach(entry => {
+                    const startTime = entry.querySelector('.start-time').value;
+                    const endTime = entry.querySelector('.end-time').value;
+                    const lateMin = parseFloat(entry.querySelector('.late-min').value) || 0;
+                    const earlyMin = parseFloat(entry.querySelector('.early-min').value) || 0;
+                    const overtimeMin = parseFloat(entry.querySelector('.overtime-min').value) || 0;
+                    const notes = entry.querySelector('.day-notes').value;
+                    
+                    if (startTime && endTime) {
+                        const [sh, sm] = startTime.split(':').map(Number);
+                        const [eh, em] = endTime.split(':').map(Number);
+                        let startMin = sh * 60 + sm;
+                        let endMin = eh * 60 + em;
+                        if (endMin <= startMin) endMin += 24 * 60;
+                        let hours = (endMin - startMin) / 60;
+                        
+                        hours = hours - (lateMin / 60) - (earlyMin / 60) + (overtimeMin / 60);
+                        
+                        items.push({
+                            hasDash: false,
+                            hours: hours,
+                            lateMin: lateMin,
+                            earlyMin: earlyMin,
+                            overtimeMin: overtimeMin,
+                            notes: notes,
+                            isVisual: true
+                        });
+                    }
+                });
+            } else {
+                const input = document.getElementById('input').value.trim();
+                if (!input) {
+                    alert('請輸入上班時間！');
+                    return;
+                }
+                const parts = input.split(/\s+/);
+                parts.forEach(item => {
+                    if (item.includes('-')) {
+                        const timeParts = item.split('-');
+                        items.push({
+                            startHMM: parseInt(timeParts[0]),
+                            endHMM: parseInt(timeParts[1]),
+                            hasDash: true
+                        });
+                    } else {
+                        let hours = 0;
+                        const num = parseInt(item);
+                        
+                        if (item.length === 1) {
+                            hours = num + 0.5;
+                        } else if (item.length === 4) {
+                            hours = 9.5;
+                        }
+                        
+                        if (hours > 0) {
+                            items.push({
+                                hours: hours,
+                                hasDash: false
+                            });
+                        }
+                    }
+                });
+            }
+
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 196;
+            const doubleDaysInput = document.getElementById('doubleDays').value.trim();
+            const doubleDays = doubleDaysInput ? doubleDaysInput.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)) : [];
+
+            const results = [];
+            let totalHours = 0;
+            let totalSalary = 0;
+
+            items.forEach((item, index) => {
+                const day = index + 1;
+                let rawHours = 0;
+                let timeStr = '';
+                let lateMin = 0;
+                let earlyMin = 0;
+                let overtimeMin = 0;
+                let notesText = '';
+
+                if (item.isVisual) {
+                    rawHours = Math.max(0, item.hours);
+                    lateMin = item.lateMin;
+                    earlyMin = item.earlyMin;
+                    overtimeMin = item.overtimeMin;
+                    notesText = item.notes;
+                    
+                    const parts = [];
+                    if (lateMin > 0) parts.push('遲到' + lateMin + '分');
+                    if (earlyMin > 0) parts.push('早退' + earlyMin + '分');
+                    if (overtimeMin > 0) parts.push('加班' + overtimeMin + '分');
+                    if (parts.length > 0) {
+                        timeStr = rawHours.toFixed(1) + 'h (' + parts.join(', ') + ')';
+                    } else {
+                        timeStr = rawHours.toFixed(1) + '小時';
+                    }
+                } else if (item.hasDash === false && item.hours !== undefined) {
+                    rawHours = item.hours;
+                    timeStr = rawHours + '小時';
+                } else if (item.hasDash) {
+                    const start = parseTime(item.startHMM);
+                    let end = parseTime(item.endHMM);
+                    if (end <= start) end += 24;
+                    rawHours = end - start;
+                    timeStr = formatTime(item.startHMM) + '～' + formatTime(item.endHMM);
+                }
+
+                let deduction = 0;
+                if (rawHours > 8) {
+                    deduction = 1.5;
+                } else if (rawHours > 4) {
+                    deduction = 0.5;
+                }
+
+                const finalHours = rawHours - deduction;
+                const isDouble = doubleDays.includes(day);
+                const salary = finalHours * hourlyRate * (isDouble ? 2 : 1);
+
+                totalHours += finalHours;
+                totalSalary += salary;
+
+                const badges = [];
+                if (isDouble) badges.push('<span class="badge">雙倍</span>');
+                if (lateMin > 0) badges.push('<span class="badge" style="background:#ff9800;">遲到</span>');
+                if (earlyMin > 0) badges.push('<span class="badge" style="background:#4caf50;">早退</span>');
+                if (overtimeMin > 0) badges.push('<span class="badge" style="background:#9c27b0;">加班</span>');
+                if (notesText) badges.push('<span style="font-size:11px; color:#666;">' + notesText + '</span>');
+
+                results.push({
+                    day,
+                    timeStr,
+                    rawHours: rawHours.toFixed(2),
+                    deduction: deduction.toFixed(1),
+                    finalHours: finalHours.toFixed(2),
+                    salary: salary.toFixed(2),
+                    badges: badges.join(' ')
+                });
+            });
+
+            const tbody = document.getElementById('resultBody');
+            tbody.innerHTML = '';
+
+            results.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.day}</td>
+                    <td>${r.timeStr}</td>
+                    <td>${r.rawHours}</td>
+                    <td>${r.deduction}</td>
+                    <td>${r.finalHours}</td>
+                    <td>NT$ ${r.salary}</td>
+                    <td>${r.badges}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const totalTr = document.createElement('tr');
+            totalTr.className = 'total-row';
+            totalTr.innerHTML = `
+                <td colspan="4">總計</td>
+                <td>${totalHours.toFixed(2)}</td>
+                <td>NT$ ${totalSalary.toFixed(2)}</td>
+                <td></td>
+            `;
+            tbody.appendChild(totalTr);
+
+            document.getElementById('resultCard').style.display = 'block';
+            
+            saveData();
+        }
+
+        // 頁面載入時讀取記憶資料
+        loadData();
+    </script>
+</body>
+</html>
